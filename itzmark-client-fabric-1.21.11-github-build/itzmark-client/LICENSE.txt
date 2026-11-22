@@ -1,0 +1,5 @@
+Copyright (c) 2026 itzMark. All rights reserved.
+
+This project is provided for personal use and modification by its owner.
+Redistribution or republishing of the project or compiled binaries without
+permission is not permitted.

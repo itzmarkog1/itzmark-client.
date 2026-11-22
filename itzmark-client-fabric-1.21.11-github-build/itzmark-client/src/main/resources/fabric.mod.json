@@ -1,0 +1,26 @@
+{
+  "schemaVersion": 1,
+  "id": "itzmarkclient",
+  "version": "${version}",
+  "name": "itzMark Client",
+  "description": "A dark red and black PvP client interface for Minecraft 1.21.11.",
+  "authors": [
+    "itzMark"
+  ],
+  "license": "All-Rights-Reserved",
+  "environment": "client",
+  "entrypoints": {
+    "client": [
+      "com.itzmark.client.ItzMarkClient"
+    ]
+  },
+  "mixins": [
+    "itzmarkclient.mixins.json"
+  ],
+  "depends": {
+    "fabricloader": ">=0.18.0",
+    "minecraft": "~1.21.11",
+    "java": ">=21",
+    "fabric-api": "*"
+  }
+}
