@@ -1,22 +1,40 @@
 
-package com.itzmark.client;
+name: Build itzMark Client
 
-import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.GuiGraphics;
-import net.minecraft.client.gui.screens.Screen;
-import net.minecraft.client.gui.screens.options.OptionsScreen;
-import net.minecraft.network.chat.Component;
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
 
-public class ItzMarkHomeScreen extends Screen {
+jobs:
+  build:
+    runs-on: ubuntu-latest
 
-    private final Screen parent;
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
 
-    public ItzMarkHomeScreen(Screen parent) {
-        super(Component.literal("itzMark Client"));
-        this.parent = parent;
-    }
+      - name: Set up JDK 21
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '21'
 
-    @Override
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v4
+
+      - name: Build Client
+        run: gradle --no-daemon clean build
+
+      - name: Upload Build
+        if: success()
+        uses: actions/upload-artifact@v4
+        with:
+          name: itzMark-Client
+          path: '**/build/libs/*.jar'
+
     protected void init() {
         int centerX = this.width / 2;
         int centerY = this.height / 2;
