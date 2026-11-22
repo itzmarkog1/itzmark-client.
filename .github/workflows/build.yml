@@ -1,44 +1,104 @@
 
-name: Build itzMark Client
+package com.itzmark.client;
 
-on:
-  workflow_dispatch:
-  push:
-    branches:
-      - main
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.client.gui.screens.options.OptionsScreen;
+import net.minecraft.network.chat.Component;
 
-permissions:
-  contents: read
+public class ItzMarkHomeScreen extends Screen {
 
-jobs:
-  build:
-    name: Build Client
-    runs-on: ubuntu-latest
+    private final Screen parent;
 
-    steps:
-      - name: Checkout Repository
-        uses: actions/checkout@v4
+    public ItzMarkHomeScreen(Screen parent) {
+        super(Component.literal("itzMark Client"));
+        this.parent = parent;
+    }
 
-      - name: Setup Java 21
-        uses: actions/setup-java@v4
-        with:
-          distribution: temurin
-          java-version: '21'
-          cache: gradle
+    @Override
+    protected void init() {
+        int centerX = this.width / 2;
+        int centerY = this.height / 2;
 
-      - name: Setup Gradle 9.2.1
-        uses: gradle/actions/setup-gradle@v4
-        with:
-          gradle-version: '9.2.1'
+        int buttonWidth = 200;
+        int buttonHeight = 20;
+        int gap = 25;
 
-      - name: Build itzMark Client
-        working-directory: itzmark-client-fabric-1.21.11-github-build/itzmark-client
-        run: gradle --no-daemon clean build
+        int startY = centerY - 70;
 
-      - name: Upload Client JAR
-        uses: actions/upload-artifact@v4
-        with:
-          name: itzMark-Client-Fabric-1.21.11
-          path: itzmark-client-fabric-1.21.11-github-build/itzmark-client/build/libs/*.jar
-          if-no-files-found: error
+        // Singleplayer
+        this.addRenderableWidget(
+            net.minecraft.client.gui.components.Button.builder(
+                Component.literal("Singleplayer"),
+                button -> Minecraft.getInstance().setScreen(
+                    new net.minecraft.client.gui.screens.worldselection.SelectWorldScreen(this)
+                )
+            ).bounds(centerX - buttonWidth / 2, startY, buttonWidth, buttonHeight).build()
+        );
+
+        // Multiplayer
+        this.addRenderableWidget(
+            net.minecraft.client.gui.components.Button.builder(
+                Component.literal("Multiplayer"),
+                button -> Minecraft.getInstance().setScreen(
+                    new net.minecraft.client.gui.screens.multiplayer.JoinMultiplayerScreen(this)
+                )
+            ).bounds(centerX - buttonWidth / 2, startY + gap, buttonWidth, buttonHeight).build()
+        );
+
+        // Settings
+        this.addRenderableWidget(
+            net.minecraft.client.gui.components.Button.builder(
+                Component.literal("Settings"),
+                button -> Minecraft.getInstance().setScreen(
+                    new OptionsScreen(this, Minecraft.getInstance().options)
+                )
+            ).bounds(centerX - buttonWidth / 2, startY + gap * 2, buttonWidth, buttonHeight).build()
+        );
+
+        // Back
+        this.addRenderableWidget(
+            net.minecraft.client.gui.components.Button.builder(
+                Component.literal("Back"),
+                button -> Minecraft.getInstance().setScreen(parent)
+            ).bounds(centerX - buttonWidth / 2, startY + gap * 3, buttonWidth, buttonHeight).build()
+        );
+    }
+
+    @Override
+    public void render(
+        GuiGraphics graphics,
+        int mouseX,
+        int mouseY,
+        float partialTick
+    ) {
+        this.renderBackground(graphics, mouseX, mouseY, partialTick);
+
+        int centerX = this.width / 2;
+
+        graphics.drawCenteredString(
+            this.font,
+            "itzMark Client",
+            centerX,
+            this.height / 2 - 115,
+            0xFF00FFFF
+        );
+
+        graphics.drawCenteredString(
+            this.font,
+            "Welcome to itzMark Client!",
+            centerX,
+            this.height / 2 - 95,
+            0xFFFFFFFF
+        );
+
+        super.render(graphics, mouseX, mouseY, partialTick);
+    }
+
+    @Override
+    public boolean isPauseScreen() {
+        return false;
+    }
+}
 
